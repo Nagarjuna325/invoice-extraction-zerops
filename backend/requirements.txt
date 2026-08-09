@@ -32,8 +32,10 @@ python-dotenv==1.0.0
 # ============================================
 # AI/ML - Core Deep Learning
 # ============================================
-torch>=2.0.0
-torchvision>=0.15.0
+# torch / torchvision are installed separately from the CPU-only index
+# (see zerops.yml buildCommands). Listing them here would make pip resolve
+# them from default PyPI and pull ~2.5GB of CUDA that never runs on this host.
+#   local dev: pip install torch torchvision
 transformers>=4.47.0
 sentencepiece>=0.2.0
 timm==0.9.12
