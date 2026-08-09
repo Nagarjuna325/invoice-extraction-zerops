@@ -1,0 +1,44 @@
+# Import at: Zerops GUI -> Project -> Import project
+# Creates all three services and wires them on the private network.
+
+project:
+  name: invoice-extraction
+  tags:
+    - wemakedevs
+    - zerops-challenge
+
+services:
+  # ---------------------------------------------------------------
+  # Managed Postgres. app/db/bootstrap.py + Base.metadata.create_all
+  # build the schema on first boot, so no migration step is needed.
+  # ---------------------------------------------------------------
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 100
+
+  # ---------------------------------------------------------------
+  # FastAPI + the full quadruple-hybrid ML stack.
+  # Build is long (~30-40 min): CPU torch, paddlepaddle, docling,
+  # plus four models baked into the artifact.
+  # ---------------------------------------------------------------
+  - hostname: api
+    type: python@3.12
+    priority: 50
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      minRam: 8
+      maxRam: 16
+      minDisk: 20
+      maxDisk: 40
+    buildFromGit: https://github.com/Nagarjuna325/invoice-extraction-ocr
+
+  # ---------------------------------------------------------------
+  # React 19 + Vite, built to static files and served by nginx.
+  # ---------------------------------------------------------------
+  - hostname: app
+    type: static
+    priority: 10
+    enableSubdomainAccess: true

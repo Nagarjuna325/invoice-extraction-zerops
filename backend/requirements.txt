@@ -1,0 +1,100 @@
+# ============================================
+# Invoice Extraction Backend - Requirements
+# Python 3.12+ Required
+# ============================================
+
+# ============================================
+# FastAPI Framework
+# ============================================
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# ============================================
+# Database
+# ============================================
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# ============================================
+# Validation & Settings
+# ============================================
+pydantic>=2.7.0
+pydantic-settings>=2.3.0
+email-validator==2.1.0
+
+# ============================================
+# Environment
+# ============================================
+python-dotenv==1.0.0
+
+# ============================================
+# AI/ML - Core Deep Learning
+# ============================================
+torch>=2.0.0
+torchvision>=0.15.0
+transformers>=4.47.0
+sentencepiece>=0.2.0
+timm==0.9.12
+protobuf==4.25.1
+accelerate>=0.20.0
+huggingface-hub>=0.16.4
+
+# ============================================
+# OCR & Image Processing
+# ============================================
+pytesseract==0.3.10
+pillow>=10.0.0
+opencv-python>=4.8.0
+paddleocr>=2.7.0
+paddlepaddle>=2.6.0
+
+# ============================================
+# PDF Processing
+# ============================================
+PyMuPDF==1.26.7
+
+# ============================================
+# Excel/CSV Processing
+# ============================================
+pandas>=2.0.0
+openpyxl==3.1.5
+
+# ============================================
+# Scientific Computing
+# ============================================
+numpy>=1.24.0,<2.0
+scipy>=1.11.0
+
+# ============================================
+# Testing (Optional)
+# ============================================
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+
+# ============================================
+# PHASE 1: Quadruple Hybrid ML System
+# ============================================
+
+# Docling - IBM Document Understanding (Full Support)
+docling>=1.16.0
+docling-core>=2.0.0
+docling-ibm-models>=2.0.0
+
+# Language Detection
+langdetect>=1.0.9
+
+# Image Quality & Processing
+scikit-image>=0.21.0
+
+# ============================================
+# Additional Utilities
+# ============================================
+python-dateutil>=2.8.0
+pytz>=2021.3
+
+
+# Semantic label matching (local)
+sentence-transformers==2.7.0

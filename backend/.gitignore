@@ -1,0 +1,29 @@
+# Python virtualenv + caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+
+# Test/coverage/tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Runtime outputs
+logs/
+uploads/
+*.log
+test_report_*.json
+
+# Local env/secrets
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
