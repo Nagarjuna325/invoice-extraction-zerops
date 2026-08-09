@@ -18,19 +18,21 @@ zerops:
       #   tesseract-ocr   -> RapidOCR is pure Python + ONNX
 
       buildCommands:
-        # Packages must live inside the deployed tree: build and run are separate
-        # containers, and only deployFiles crosses between them.
-        - cd backend && python -m venv .venv
-        - cd backend && . .venv/bin/activate && pip install --upgrade pip wheel
+        # No venv: `python -m venv` fails here because ensurepip's bundled data
+        # is missing from the image and python3-venv can't be apt-installed.
+        # `pip --target` gives the same result — a self-contained package dir
+        # inside the deployed tree, which is what matters since build and run
+        # are separate containers and only deployFiles crosses between them.
+        - cd backend && python -m pip --version
         # CPU-only torch. The default wheel drags in ~2.5GB of CUDA that never runs here.
-        - cd backend && . .venv/bin/activate && pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
-        - cd backend && . .venv/bin/activate && pip install -r requirements.txt
-        - cd backend && . .venv/bin/activate && pip install rapidocr
+        - cd backend && python -m pip install --target=.python-deps --index-url https://download.pytorch.org/whl/cpu torch torchvision
+        - cd backend && python -m pip install --target=.python-deps -r requirements.txt
+        - cd backend && python -m pip install --target=.python-deps rapidocr
         # Bake the four models in. Without this, every cold start stalls on a ~4GB
         # HuggingFace download before it can answer a single request.
-        - cd backend && export HF_HOME=$(pwd)/.hf_cache && . .venv/bin/activate && python download_impira.py
-        - cd backend && export HF_HOME=$(pwd)/.hf_cache && . .venv/bin/activate && python download_layoutlm.py
-        - cd backend && export HF_HOME=$(pwd)/.hf_cache && . .venv/bin/activate && python download_donut.py
+        - cd backend && export PYTHONPATH=$(pwd)/.python-deps && export HF_HOME=$(pwd)/.hf_cache && python download_impira.py
+        - cd backend && export PYTHONPATH=$(pwd)/.python-deps && export HF_HOME=$(pwd)/.hf_cache && python download_layoutlm.py
+        - cd backend && export PYTHONPATH=$(pwd)/.python-deps && export HF_HOME=$(pwd)/.hf_cache && python download_donut.py
 
       # The trailing /~ flattens backend/ contents to the deploy root, so app/
       # and .venv/ land where the start command expects them.
@@ -38,7 +40,7 @@ zerops:
         - backend/~
 
       cache:
-        - backend/.venv
+        - backend/.python-deps
         - backend/.hf_cache
 
     run:
@@ -98,6 +100,9 @@ zerops:
         # pydantic-settings parses List[str] fields as JSON.
         ALLOWED_ORIGINS: '["https://${app_zeropsSubdomain}", "http://localhost:5173", "http://localhost:3000"]'
 
+        # Packages were installed with pip --target, so the runtime needs them on the path.
+        PYTHONPATH: /var/www/.python-deps
+
         UPLOAD_DIR: /var/www/uploads
         LOG_FILE: /var/www/logs/app.log
 
@@ -110,7 +115,7 @@ zerops:
       # int and duration forms of failureTimeout. Zerops' default port check
       # is sufficient. Add one back later if model-load time trips it.
 
-      start: .venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 300
+      start: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 300
 
   # =================================================================
   # app - React 19 + Vite, built to static files
