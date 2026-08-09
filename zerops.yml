@@ -9,14 +9,13 @@ zerops:
     build:
       base: ubuntu/python@3.12
 
-      # System libraries the ML stack links against.
-      # opencv needs libGL/glib, pymupdf+docling need poppler, pytesseract needs the binary.
-      prepareCommands:
-        - sudo apt-get update
-        - sudo apt-get install -y --no-install-recommends
-          tesseract-ocr tesseract-ocr-eng
-          libgl1 libglib2.0-0 libsm6 libxext6 libxrender1
-          poppler-utils
+      # No apt step. DNS is unreachable from the build container in this region
+      # (archive.ubuntu.com, security.ubuntu.com and github.com all fail to
+      # resolve), so apt can't fetch package lists. Every system dependency has
+      # a pip-only equivalent instead:
+      #   libgl1/libglib  -> opencv-python-headless needs neither
+      #   poppler-utils   -> PyMuPDF bundles its own PDF renderer
+      #   tesseract-ocr   -> RapidOCR is pure Python + ONNX
 
       buildCommands:
         # Packages must live inside the deployed tree: build and run are separate
@@ -45,12 +44,7 @@ zerops:
     run:
       base: ubuntu/python@3.12
 
-      prepareCommands:
-        - sudo apt-get update
-        - sudo apt-get install -y --no-install-recommends
-          tesseract-ocr tesseract-ocr-eng
-          libgl1 libglib2.0-0 libsm6 libxext6 libxrender1
-          poppler-utils
+      # No apt at runtime either - same DNS problem, and nothing here needs it.
 
       ports:
         - port: 8000
@@ -71,11 +65,17 @@ zerops:
         HF_HUB_OFFLINE: "1"
         TRANSFORMERS_OFFLINE: "1"
 
-        TESSERACT_PATH: /usr/bin/tesseract
         TESSERACT_LANG: eng
 
-        # Full quadruple-hybrid, matching the local .env.
-        USE_TESSERACT_OCR_VOTER: "1"
+        # No Tesseract binary in this image (apt is unreachable), so every code
+        # path that shells out to it is off. RapidOCR covers OCR instead.
+        USE_TESSERACT_OCR_VOTER: "0"
+        USE_TESSERACT_OCR: "0"
+        OCR_MATRIX_ENABLE_TESSERACT: "0"
+        ENABLE_AMOUNT_COLUMN_REOCR: "0"
+        ENABLE_FOOTER_TOTAL_EXTRACT: "0"
+
+        # The four-model consensus core is untouched by any of the above.
         ENABLE_TEMPLATE_VOTER: "1"
         STORE_OCR_TOKENS: "1"
         STORE_OCR_TEXTS: "1"

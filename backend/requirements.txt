@@ -46,7 +46,9 @@ huggingface-hub>=0.16.4
 # ============================================
 pytesseract==0.3.10
 pillow>=10.0.0
-opencv-python>=4.8.0
+# headless variant: same API, but needs no libGL/libglib system packages,
+# which matters on hosts where apt is unavailable
+opencv-python-headless>=4.8.0
 paddleocr>=2.7.0
 paddlepaddle>=2.6.0
 
