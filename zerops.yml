@@ -3,11 +3,11 @@
 
 zerops:
   # =================================================================
-  # api — FastAPI + the full quadruple-hybrid ML stack
+  # api - FastAPI + the full quadruple-hybrid ML stack
   # =================================================================
   - setup: api
     build:
-      base: python@3.12
+      base: ubuntu/python@3.12
 
       # System libraries the ML stack links against.
       # opencv needs libGL/glib, pymupdf+docling need poppler, pytesseract needs the binary.
@@ -43,7 +43,7 @@ zerops:
         - backend/.hf_cache
 
     run:
-      base: python@3.12
+      base: ubuntu/python@3.12
 
       prepareCommands:
         - sudo apt-get update
@@ -101,7 +101,7 @@ zerops:
         UPLOAD_DIR: /var/www/uploads
         LOG_FILE: /var/www/logs/app.log
 
-      # RAM/disk/container counts are service-level settings, not pipeline settings —
+      # RAM/disk/container counts are service-level settings, not pipeline settings -
       # they live in zerops-project-import.yml (verticalAutoscaling) and the GUI.
       # Four models resident at once needs ~8GB; one container only, since each
       # additional replica would load its own full model set.
@@ -113,7 +113,7 @@ zerops:
       start: .venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 300
 
   # =================================================================
-  # app — React 19 + Vite, built to static files
+  # app - React 19 + Vite, built to static files
   # =================================================================
   - setup: app
     build:
@@ -130,7 +130,7 @@ zerops:
         - frontend/node_modules
 
       envVariables:
-        # Vite inlines VITE_* at build time. The /api/v1 suffix matters —
+        # Vite inlines VITE_* at build time. The /api/v1 suffix matters -
         # src/config reads this straight into the axios baseURL.
         VITE_API_BASE_URL: ${api_zeropsSubdomain}/api/v1
         VITE_APP_NAME: Invoice Extraction System
@@ -145,5 +145,5 @@ zerops:
 
       # NOTE: react-router needs unmatched paths to fall through to index.html.
       # Zerops does that via an nginx config (siteConfigPath), not a `routing`
-      # block — wire it up when this service is actually deployed. Until then
+      # block - wire it up when this service is actually deployed. Until then
       # deep links 404 while the app root works fine.
