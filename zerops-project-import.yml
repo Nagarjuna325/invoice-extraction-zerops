@@ -33,7 +33,7 @@ services:
       maxRam: 16
       minDisk: 20
       maxDisk: 40
-    buildFromGit: https://github.com/Nagarjuna325/invoice-extraction-ocr
+    buildFromGit: https://github.com/Nagarjuna325/invoice-extraction-zerops
 
   # ---------------------------------------------------------------
   # React 19 + Vite, built to static files and served by nginx.
