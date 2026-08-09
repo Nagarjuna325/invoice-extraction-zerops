@@ -106,14 +106,9 @@ zerops:
       # Four models resident at once needs ~8GB; one container only, since each
       # additional replica would load its own full model set.
 
-      healthCheck:
-        httpGet:
-          port: 8000
-          path: /
-        # Duration string, not an int — the parser wants time.Duration here.
-        # Generous because loading four transformer models takes minutes and the
-        # container must not be reaped mid-startup.
-        failureTimeout: 900s
+      # No healthCheck block: it's optional, and its schema rejected both the
+      # int and duration forms of failureTimeout. Zerops' default port check
+      # is sufficient. Add one back later if model-load time trips it.
 
       start: .venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 300
 
