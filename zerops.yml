@@ -86,6 +86,10 @@ zerops:
         PRE_OCR_AUTO_DETECT_PAGE_SIZE: "1"
         PRE_OCR_PAGE_SIZE_FALLBACK: letter
         PRE_OCR_ENABLE_DESKEW: "1"
+
+        # Full OCR matrix + fusion. TrOCR (~1.3GB) and PaddleOCR run on top of the
+        # four main models, so this needs a container above ~8GB RAM to survive
+        # extraction. Sized accordingly in the service scaling config.
         PRE_OCR_GENERATE_VARIANTS: "1"
         ENABLE_OCR_MATRIX: "1"
         ENABLE_OCR_FUSION: "1"
@@ -106,10 +110,10 @@ zerops:
         httpGet:
           port: 8000
           path: /
-        # Loading four models takes minutes. Don't let the platform reap it first.
-        initialDelaySeconds: 300
-        periodSeconds: 30
-        failureTimeout: 120
+        # Duration string, not an int — the parser wants time.Duration here.
+        # Generous because loading four transformer models takes minutes and the
+        # container must not be reaped mid-startup.
+        failureTimeout: 900s
 
       start: .venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 300
 
@@ -144,8 +148,7 @@ zerops:
         - port: 80
           httpSupport: true
 
-      # SPA: react-router owns the routes, so unmatched paths must fall
-      # through to index.html instead of 404ing.
-      routing:
-        root: /
-        errorPage: index.html
+      # NOTE: react-router needs unmatched paths to fall through to index.html.
+      # Zerops does that via an nginx config (siteConfigPath), not a `routing`
+      # block — wire it up when this service is actually deployed. Until then
+      # deep links 404 while the app root works fine.
