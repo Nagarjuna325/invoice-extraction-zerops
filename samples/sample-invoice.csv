@@ -1,0 +1,16 @@
+INVOICE,,,
+From: Northwind Traders,,,
+Invoice No: INV-2026-0842,,,
+Invoice Date: August 3 2026,,,
+Bill To: Contoso Manufacturing,,,
+,,,
+Description,Quantity,Unit Price,Amount
+Steel bearings 608ZZ,250,4.20,1050.00
+Hydraulic seal kit,40,18.75,750.00
+Precision shaft collar,120,6.35,762.00
+Industrial lubricant 5L,25,29.90,747.50
+Freight and handling,1,142.25,142.25
+,,,
+Subtotal: $3451.75,,,
+Tax 8.25%: $284.77,,,
+TOTAL: $3736.52,,,

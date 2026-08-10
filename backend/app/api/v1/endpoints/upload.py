@@ -408,7 +408,7 @@ from app.services.document_processor import document_processor
 from app.utils.validators import validate_upload
 from app.utils.file_helper import normalize_file_type
 from app.utils.image_quality_checker import image_quality_checker  # PHASE 4: NEW
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from app.config import settings
 from datetime import datetime
 import logging
@@ -494,6 +494,16 @@ def process_invoice_background(upload_id: str, file_path: str, ocr_engine: str):
 
         temp_files_for_cleanup: List[str] = []
         template_image_path: Optional[str] = None
+
+        # These are only assigned inside the image/PDF branches, but read
+        # unconditionally when the results are persisted below. Excel and CSV
+        # skip those branches entirely, so without defaults every spreadsheet
+        # upload died with UnboundLocalError on ocr_texts_payload.
+        model_outputs: Dict[str, Any] = {}
+        voting_details: Dict[str, Any] = {}
+        ocr_tokens_payload: Dict[str, Any] = {}
+        ocr_texts_payload: Dict[str, Any] = {}
+        ocr_fused_payload: Dict[str, Any] = {}
 
         # STEP 1: Process document (detect type and convert if needed)
         logger.info(f"[1/7] Processing document type...")
