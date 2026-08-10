@@ -8,8 +8,8 @@ Four document-understanding models read each page independently and vote. Where 
 disagree, the disagreement is visible in the response rather than hidden behind a
 single guess.
 
-**Live:** _(add the api subdomain here once deployed)_
-**API docs:** `/api/docs`
+**Live:** https://api-2ea1-8000.prg1.zerops.app
+**API docs:** https://api-2ea1-8000.prg1.zerops.app/api/docs
 
 ---
 
