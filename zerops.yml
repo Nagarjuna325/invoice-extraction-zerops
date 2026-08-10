@@ -37,8 +37,9 @@ zerops:
       deployFiles:
         - backend/~
 
-      # No build cache: the previous cache holds the CUDA torch packages that
-      # blew the artifact up to 8.5GB and failed the S3 upload. Clean install.
+      # Safe to cache now the CUDA packages are gone from .python-deps.
+      cache:
+        - backend/.python-deps
 
     run:
       base: ubuntu/python@3.12

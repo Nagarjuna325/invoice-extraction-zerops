@@ -41,9 +41,11 @@ app.include_router(api_router, prefix="/api/v1")
 @app.on_event("startup")
 async def startup_event():
     logger.info(f"Starting {settings.APP_NAME}")
-    # Apply idempotent schema upgrades before creating missing tables
-    apply_schema_upgrades(engine)
+    # Create tables first, then upgrade them. The other order only works against
+    # a database that already has the tables — against a fresh one the ALTER
+    # statements in bootstrap fail with UndefinedTable and startup aborts.
     Base.metadata.create_all(bind=engine)
+    apply_schema_upgrades(engine)
 
 
 @app.get("/")
