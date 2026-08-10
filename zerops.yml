@@ -109,9 +109,15 @@ zerops:
       # Four models resident at once needs ~8GB; one container only, since each
       # additional replica would load its own full model set.
 
-      # No healthCheck block: it's optional, and its schema rejected both the
-      # int and duration forms of failureTimeout. Zerops' default port check
-      # is sufficient. Add one back later if model-load time trips it.
+      # Minimal healthCheck: httpGet only. Without any healthCheck the runtime
+      # logs "healthcheck is disabled" and the router never marks the container
+      # ready, so every request 502s even though uvicorn is bound to :8000.
+      # Do NOT add failureTimeout/periodSeconds here — the schema rejects the
+      # int form and the Kubernetes-style keys don't exist in Zerops.
+      healthCheck:
+        httpGet:
+          port: 8000
+          path: /
 
       start: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 300
 
